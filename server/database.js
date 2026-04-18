@@ -8,6 +8,12 @@ const SCHEMA = `
 CREATE TABLE IF NOT EXISTS users (
   id TEXT PRIMARY KEY, email TEXT UNIQUE NOT NULL, password_hash TEXT NOT NULL,
   role TEXT NOT NULL DEFAULT 'HR_RECRUITER', display_name TEXT,
+  disabled INTEGER DEFAULT 0,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+CREATE TABLE IF NOT EXISTS problem_reports (
+  id TEXT PRIMARY KEY, user_id TEXT, user_email TEXT,
+  subject TEXT, description TEXT, page TEXT,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 CREATE TABLE IF NOT EXISTS user_activity_logs (
