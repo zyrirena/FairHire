@@ -1,0 +1,8 @@
+node_modules
+client/node_modules
+client/dist
+data/fairhire.db
+uploads/*
+.env
+.git
+*.tar.gz
