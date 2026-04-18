@@ -11,6 +11,7 @@ import DatasetPage from './pages/DatasetPage';
 import ActivityLogsPage from './pages/ActivityLogsPage';
 import UsagePage from './pages/UsagePage';
 import FairnessPage from './pages/FairnessPage';
+import ReportProblemButton from './components/ReportProblemButton';
 
 function App() {
   return (
@@ -114,12 +115,17 @@ function MainApp() {
                   <span className="dot"></span>
                   {health.mode === 'mock' ? 'Mock Mode' : 'Claude Live'}
                 </span>
-                <span className={`mode-badge ${health.pii_engine === 'presidio' ? 'live' : 'mock'}`}>
+                <span className={`mode-badge ${health.pii_engine === 'presidio' ? 'live' : 'mock'}`} style={{ marginBottom: '6px' }}>
                   <span className="dot"></span>
                   PII: {health.pii_engine === 'presidio' ? 'Presidio' : 'Regex'}
                 </span>
+                <span className={`mode-badge ${health.fairlearn === 'available' ? 'live' : 'mock'}`}>
+                  <span className="dot"></span>
+                  Fairlearn: {health.fairlearn === 'available' ? 'Active' : 'Off'}
+                </span>
               </>
             )}
+            <ReportProblemButton />
           </div>
         </aside>
 

@@ -147,6 +147,10 @@ export const api = {
 
   // Admin
   getUsers: () => apiFetch('/auth/users'),
+  disableUser: (id) => apiFetch(`/auth/users/${id}/disable`, { method: 'POST' }),
+  enableUser: (id) => apiFetch(`/auth/users/${id}/enable`, { method: 'POST' }),
+  changeUserRole: (id, role) => apiFetch(`/auth/users/${id}/role`, { method: 'POST', body: JSON.stringify({ role }) }),
+  getProblemReports: () => apiFetch('/auth/problem-reports'),
   getActivityLogs: (params = {}) => {
     const q = new URLSearchParams(params).toString();
     return apiFetch(`/auth/activity-logs?${q}`);
@@ -157,4 +161,7 @@ export const api = {
   },
   getUsage: () => apiFetch('/auth/usage'),
   resetUsage: (month) => apiFetch('/auth/usage/reset', { method: 'POST', body: JSON.stringify({ month }) }),
+
+  // Problem Report
+  reportProblem: (description, page) => apiFetch('/auth/report-problem', { method: 'POST', body: JSON.stringify({ description, page }) }),
 };
