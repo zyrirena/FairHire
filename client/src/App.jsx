@@ -12,6 +12,7 @@ import ActivityLogsPage from './pages/ActivityLogsPage';
 import UsagePage from './pages/UsagePage';
 import FairnessPage from './pages/FairnessPage';
 import HiringManagerPage from './pages/HiringManagerPage';
+import JobManagementPage from './pages/JobManagementPage';
 import ReportProblemButton from './components/ReportProblemButton';
 
 function App() {
@@ -76,10 +77,14 @@ function MainApp() {
               </>
             )}
 
-            {/* Hiring Manager nav */}
+            {/* Hiring Manager + Admin: Job Management + Candidate Selection */}
             {(isHiringManager || isAdmin) && (
               <>
                 {isAdmin && <div style={{ height: '1px', background: 'var(--border)', margin: '10px 12px' }} />}
+                <NavLink to="/jobs" className={({isActive}) => isActive ? 'active' : ''}>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v3"/></svg>
+                  Job Profiles
+                </NavLink>
                 <NavLink to="/hiring" className={({isActive}) => isActive ? 'active' : ''}>
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="8.5" cy="7" r="4"/><path d="M20 8v6"/><path d="M23 11h-6"/></svg>
                   {isHiringManager ? 'Candidate Selection' : 'Hiring Manager View'}
@@ -160,9 +165,12 @@ function MainApp() {
               </>
             )}
 
-            {/* Hiring Manager route */}
+            {/* Hiring Manager + Admin routes */}
             {(isHiringManager || isAdmin) && (
-              <Route path="/hiring" element={<HiringManagerPage />} />
+              <>
+                <Route path="/jobs" element={<JobManagementPage />} />
+                <Route path="/hiring" element={<HiringManagerPage />} />
+              </>
             )}
 
             {/* Hiring Manager default */}

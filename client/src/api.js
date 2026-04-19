@@ -80,6 +80,7 @@ export const api = {
   getJobs: () => apiFetch('/jobs'),
   getJob: (id) => apiFetch(`/jobs/${id}`),
   createJob: (data) => apiFetch('/jobs', { method: 'POST', body: JSON.stringify(data) }),
+  updateJob: (id, data) => apiFetch(`/jobs/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
   deleteJob: (id) => apiFetch(`/jobs/${id}`, { method: 'DELETE' }),
 
   // Candidates

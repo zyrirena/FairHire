@@ -29,8 +29,11 @@ CREATE TABLE IF NOT EXISTS usage_tracking (
 );
 CREATE TABLE IF NOT EXISTS job_descriptions (
   id TEXT PRIMARY KEY, title TEXT NOT NULL, description TEXT NOT NULL,
-  requirements TEXT, min_education TEXT, min_experience_years INTEGER DEFAULT 0,
-  required_skills TEXT, created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  department TEXT DEFAULT '', requirements TEXT,
+  min_education TEXT, min_experience_years INTEGER DEFAULT 0,
+  required_skills TEXT, preferred_skills TEXT DEFAULT '',
+  scoring_weights TEXT DEFAULT '{"skills":0.4,"experience":0.3,"education":0.1,"certifications":0.2}',
+  created_by TEXT, created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 CREATE TABLE IF NOT EXISTS candidates (
   id TEXT PRIMARY KEY, original_filename TEXT, anonymized_text TEXT, raw_text TEXT,
