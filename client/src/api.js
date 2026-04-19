@@ -145,6 +145,12 @@ export const api = {
   getFairlearnLiveAnalysis: (jobId = '') => apiFetch(`/evaluations/fairlearn/live-analysis${jobId ? `?job_id=${jobId}` : ''}`),
   runFairlearnAnalysis: (data) => apiFetch('/evaluations/fairlearn/analyze', { method: 'POST', body: JSON.stringify(data) }),
 
+  // Hiring Manager
+  getCertifiedJobs: () => apiFetch('/evaluations/hiring-manager/certified-jobs'),
+  getHMCandidates: (jobId) => apiFetch(`/evaluations/hiring-manager/candidates/${jobId}`),
+  submitHiringDecision: (data) => apiFetch('/evaluations/hiring-manager/decision', { method: 'POST', body: JSON.stringify(data) }),
+  getHiringDecision: (jobId) => apiFetch(`/evaluations/hiring-manager/decision/${jobId}`),
+
   // Admin
   getUsers: () => apiFetch('/auth/users'),
   disableUser: (id) => apiFetch(`/auth/users/${id}/disable`, { method: 'POST' }),
