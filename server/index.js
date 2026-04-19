@@ -68,7 +68,8 @@ setInterval(async () => {
 async function seedDefaultUsers() {
   await createUser('admin@fairhire.local', 'Admin123!', 'ADMIN', 'Admin');
   await createUser('recruiter@fairhire.local', 'Recruiter123!', 'HR_RECRUITER', 'Recruiter');
-  console.log('✓ Default users ready (admin@fairhire.local / recruiter@fairhire.local)');
+  await createUser('manager@fairhire.local', 'Manager123!', 'HIRING_MANAGER', 'Hiring Manager');
+  console.log('✓ Default users ready (admin / recruiter / manager @fairhire.local)');
 }
 
 async function start() {

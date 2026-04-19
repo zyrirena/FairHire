@@ -338,4 +338,107 @@ router.post('/:id/override', async (req, res) => {
   res.status(201).json({ id: oid, success: true });
 });
 
+// ═══════════════════════════════════════════════════
+// HIRING MANAGER ENDPOINTS (certification-gated)
+// ═══════════════════════════════════════════════════
+
+// Get certified candidates for a job (HIRING_MANAGER only sees certified + qualified)
+router.get('/hiring-manager/candidates/:job_id', requireAuth, async (req, res) => {
+  try {
+    const db = await getDB();
+    const userRole = req.user.role;
+
+    // Check if this job has been certified
+    const cert = db.prepare('SELECT * FROM hr_certifications WHERE job_id = ? ORDER BY certified_at DESC LIMIT 1').get(req.params.job_id);
+
+    if (userRole === 'HIRING_MANAGER') {
+      if (!cert) return res.status(403).json({ error: 'This job has not been certified by a recruiter yet. You will gain access after certification.' });
+
+      // Only show Meets or Partially Meets
+      const evals = db.prepare(`
+        SELECT e.*, c.original_filename, j.title as job_title
+        FROM evaluations e
+        LEFT JOIN candidates c ON e.candidate_id = c.id
+        LEFT JOIN job_descriptions j ON e.job_id = j.id
+        WHERE e.job_id = ? AND e.qualification IN ('Meets requirements', 'Partially meets requirements')
+        ORDER BY e.overall_score DESC
+      `).all(req.params.job_id);
+
+      // Check for existing decisions
+      const decision = db.prepare('SELECT * FROM hiring_decisions WHERE job_id = ? ORDER BY created_at DESC LIMIT 1').get(req.params.job_id);
+
+      return res.json({ candidates: evals, certification: cert, decision: decision || null });
+    }
+
+    // ADMIN and HR_RECRUITER see everything
+    const evals = db.prepare(`
+      SELECT e.*, c.original_filename, j.title as job_title
+      FROM evaluations e
+      LEFT JOIN candidates c ON e.candidate_id = c.id
+      LEFT JOIN job_descriptions j ON e.job_id = j.id
+      WHERE e.job_id = ?
+      ORDER BY e.overall_score DESC
+    `).all(req.params.job_id);
+
+    const decision = db.prepare('SELECT * FROM hiring_decisions WHERE job_id = ? ORDER BY created_at DESC LIMIT 1').get(req.params.job_id);
+
+    res.json({ candidates: evals, certification: cert || null, decision: decision || null });
+  } catch (error) { res.status(500).json({ error: error.message }); }
+});
+
+// Get all certified jobs (for hiring manager job list)
+router.get('/hiring-manager/certified-jobs', requireAuth, async (req, res) => {
+  try {
+    const db = await getDB();
+    const certifiedJobs = db.prepare(`
+      SELECT j.*, hc.certified_at, hc.certified_by_name, hc.candidates_reviewed,
+        (SELECT COUNT(*) FROM evaluations e WHERE e.job_id = j.id AND e.qualification IN ('Meets requirements', 'Partially meets requirements')) as qualified_count,
+        (SELECT COUNT(*) FROM hiring_decisions hd WHERE hd.job_id = j.id) as has_decision
+      FROM job_descriptions j
+      INNER JOIN hr_certifications hc ON j.id = hc.job_id
+      GROUP BY j.id
+      ORDER BY hc.certified_at DESC
+    `).all();
+    res.json(certifiedJobs);
+  } catch (error) { res.status(500).json({ error: error.message }); }
+});
+
+// Submit hiring decision (HIRING_MANAGER or ADMIN)
+router.post('/hiring-manager/decision', requireAuth, async (req, res) => {
+  try {
+    const { job_id, selected_candidate_id, alternates, notes } = req.body;
+    if (!job_id) return res.status(400).json({ error: 'job_id required' });
+    if (!selected_candidate_id) return res.status(400).json({ error: 'selected_candidate_id required' });
+
+    const db = await getDB();
+
+    // Verify job is certified
+    const cert = db.prepare('SELECT * FROM hr_certifications WHERE job_id = ? ORDER BY certified_at DESC LIMIT 1').get(job_id);
+    if (!cert) return res.status(400).json({ error: 'Job must be certified before a decision can be made' });
+
+    // Verify selected candidate has a qualifying evaluation
+    const selEval = db.prepare("SELECT * FROM evaluations WHERE candidate_id = ? AND job_id = ? AND qualification IN ('Meets requirements', 'Partially meets requirements')").get(selected_candidate_id, job_id);
+    if (!selEval) return res.status(400).json({ error: 'Selected candidate must have a qualifying evaluation' });
+
+    const id = uuidv4();
+    db.prepare('INSERT INTO hiring_decisions (id, job_id, hiring_manager_id, hiring_manager_email, selected_candidate_id, alternates, notes) VALUES (?, ?, ?, ?, ?, ?, ?)').run(
+      id, job_id, req.user.id, req.user.email, selected_candidate_id,
+      JSON.stringify(alternates || []), notes || ''
+    );
+
+    await logActivity(req.user.id, req.user.email, req.user.role, 'HIRING_DECISION', {
+      job_id, selected_candidate_id, alternates_count: (alternates || []).length, notes
+    });
+
+    res.status(201).json({ id, success: true });
+  } catch (error) { res.status(500).json({ error: error.message }); }
+});
+
+// Get hiring decision for a job
+router.get('/hiring-manager/decision/:job_id', requireAuth, async (req, res) => {
+  const db = await getDB();
+  const decision = db.prepare('SELECT * FROM hiring_decisions WHERE job_id = ? ORDER BY created_at DESC LIMIT 1').get(req.params.job_id);
+  res.json(decision || null);
+});
+
 module.exports = router;

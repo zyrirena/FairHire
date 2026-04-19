@@ -26,8 +26,10 @@ async function seed() {
   console.log('Creating default users...');
   await createUser('admin@fairhire.local', 'Admin123!', 'ADMIN', 'Admin');
   await createUser('recruiter@fairhire.local', 'Recruiter123!', 'HR_RECRUITER', 'Recruiter');
+  await createUser('manager@fairhire.local', 'Manager123!', 'HIRING_MANAGER', 'Hiring Manager');
   console.log('  ✓ admin@fairhire.local (password: Admin123!)');
   console.log('  ✓ recruiter@fairhire.local (password: Recruiter123!)');
+  console.log('  ✓ manager@fairhire.local (password: Manager123!)');
 
   await downloadDataset();
   const dataCount = await loadDatasetIntoDB();

@@ -82,7 +82,7 @@ router.post('/users/:id/enable', requireAuth, requireRole('ADMIN'), async (req, 
 // Change user role
 router.post('/users/:id/role', requireAuth, requireRole('ADMIN'), async (req, res) => {
   const { role } = req.body;
-  if (!['ADMIN', 'HR_RECRUITER'].includes(role)) return res.status(400).json({ error: 'Invalid role' });
+  if (!['ADMIN', 'HR_RECRUITER', 'HIRING_MANAGER'].includes(role)) return res.status(400).json({ error: 'Invalid role' });
   if (req.params.id === req.user.id) return res.status(400).json({ error: 'You cannot change your own role' });
   await updateUserRole(req.params.id, role);
   await logActivity(req.user.id, req.user.email, req.user.role, 'USER_ROLE_CHANGED', { target_user_id: req.params.id, new_role: role });

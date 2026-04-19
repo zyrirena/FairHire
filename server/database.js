@@ -68,6 +68,12 @@ CREATE TABLE IF NOT EXISTS bias_test_results (
 CREATE TABLE IF NOT EXISTS dataset_records (
   id INTEGER PRIMARY KEY AUTOINCREMENT, category TEXT, resume_text TEXT,
   source TEXT DEFAULT 'kaggle', loaded_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+CREATE TABLE IF NOT EXISTS hiring_decisions (
+  id TEXT PRIMARY KEY, job_id TEXT NOT NULL, hiring_manager_id TEXT NOT NULL,
+  hiring_manager_email TEXT, selected_candidate_id TEXT,
+  alternates TEXT, notes TEXT,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );`;
 
 let db = null;
