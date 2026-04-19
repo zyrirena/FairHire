@@ -70,13 +70,10 @@ You'll see the login screen.
 |------|-------|----------|
 | **Admin** | admin@fairhire.local | Admin123! |
 | **Recruiter** | recruiter@fairhire.local | Recruiter123! |
-| **HR Manager** | manager@fairhire.local | Manager123! |
 
-**Admin** can see everything: all users, activity logs, AI usage costs, compliance data, edit jobs, view as HM. 
+**Admin** can see everything: all users, activity logs, AI usage costs, compliance data.
 
 **Recruiter** can upload resumes, view candidates, override AI decisions, and add notes.
-
-**Manager** create a job description, review certified resumes, make a selection.
 
 ---
 
