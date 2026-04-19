@@ -70,7 +70,16 @@ CREATE TABLE IF NOT EXISTS bias_test_results (
 );
 CREATE TABLE IF NOT EXISTS dataset_records (
   id INTEGER PRIMARY KEY AUTOINCREMENT, category TEXT, resume_text TEXT,
-  source TEXT DEFAULT 'kaggle', loaded_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  source TEXT DEFAULT 'direct_upload', ingestion_method TEXT DEFAULT 'manual_upload',
+  consent_flag INTEGER DEFAULT 1, preprocessing_notes TEXT DEFAULT '',
+  loaded_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+CREATE TABLE IF NOT EXISTS risk_register (
+  id TEXT PRIMARY KEY, risk_name TEXT NOT NULL, description TEXT,
+  severity TEXT DEFAULT 'medium', likelihood TEXT DEFAULT 'medium',
+  mitigation_strategy TEXT, identified_by TEXT, identified_by_email TEXT,
+  status TEXT DEFAULT 'open', resolved_at DATETIME,
+  identified_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 CREATE TABLE IF NOT EXISTS hiring_decisions (
   id TEXT PRIMARY KEY, job_id TEXT NOT NULL, hiring_manager_id TEXT NOT NULL,

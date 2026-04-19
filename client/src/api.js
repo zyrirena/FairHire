@@ -171,4 +171,13 @@ export const api = {
 
   // Problem Report
   reportProblem: (description, page) => apiFetch('/auth/report-problem', { method: 'POST', body: JSON.stringify({ description, page }) }),
+
+  // Risk Register (Admin)
+  getRisks: () => apiFetch('/audit/risks'),
+  createRisk: (data) => apiFetch('/audit/risks', { method: 'POST', body: JSON.stringify(data) }),
+  updateRisk: (id, data) => apiFetch(`/audit/risks/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  deleteRisk: (id) => apiFetch(`/audit/risks/${id}`, { method: 'DELETE' }),
+
+  // Public audit summary (no auth)
+  getPublicAuditSummary: () => fetch(`${BASE}/public/audit-summary`).then(r => r.json()),
 };

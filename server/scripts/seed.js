@@ -60,6 +60,25 @@ async function seed() {
     console.log(`    → ${result.qualification} (${overall.toFixed(1)}/10)`);
   }
 
+  // Seed default risk register entries (EU AI Act requirement)
+  const defaultRisks = [
+    { name: 'Bias in skill keyword matching', desc: 'AI may over-weight exact keyword matches, disadvantaging candidates who describe skills differently.', severity: 'medium', likelihood: 'medium', mitigation: 'PII scrubbing + Presidio NLP + Fairlearn demographic parity testing' },
+    { name: 'Missing resume data', desc: 'Incomplete resumes may receive unfairly low scores due to missing fields.', severity: 'low', likelihood: 'high', mitigation: 'Mock mode fallback scoring; recruiter override capability' },
+    { name: 'AI model hallucination', desc: 'Claude may infer qualifications not present in the resume text.', severity: 'high', likelihood: 'low', mitigation: 'Structured JSON output enforced; validation layer before saving; human review required' },
+    { name: 'Over-reliance on AI scoring', desc: 'Users may treat AI scores as definitive rather than advisory.', severity: 'medium', likelihood: 'medium', mitigation: 'All results labeled "AI-assisted recommendation"; HR certification gate; hiring manager final decision' },
+    { name: 'Scoring weight manipulation', desc: 'Extreme scoring weights could create discriminatory outcomes.', severity: 'medium', likelihood: 'low', mitigation: 'Weights capped at 0.7 max per criterion; must sum to 1.0; validated on input' },
+    { name: 'PII leakage to AI model', desc: 'Personally identifiable information may survive scrubbing and reach the AI.', severity: 'high', likelihood: 'low', mitigation: 'Microsoft Presidio NLP + regex fallback; 13+ entity types detected; verification audit in bias tests' },
+  ];
+  const existingRisks = db.prepare('SELECT COUNT(*) as count FROM risk_register').get();
+  if (existingRisks.count === 0) {
+    for (const r of defaultRisks) {
+      db.prepare('INSERT INTO risk_register (id, risk_name, description, severity, likelihood, mitigation_strategy, identified_by, identified_by_email, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)').run(
+        uuidv4(), r.name, r.desc, r.severity, r.likelihood, r.mitigation, 'system', 'system@fairhire.ai', 'monitoring'
+      );
+    }
+    console.log(`  ✓ ${defaultRisks.length} default risk register entries`);
+  }
+
   console.log('\n✅ Seed complete!\n');
 }
 
